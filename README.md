@@ -13,6 +13,7 @@ Setup -
 ```sh
 git clone https://github.com/brijeshb42/react-ssr-example.git
 cd react-ssr-example
+```
 
 2. Install deps
 
