@@ -1,0 +1,47 @@
+{
+  "name": "react-ssr-example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "NODE_ENV=development BE_PORT=3000 FE_PORT=3001 DEBUG=dev:god,dev:server,dev:client,dev:express node scripts/god.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Brijesh <brijesh@bitwiser.in>",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "1.18.3",
+    "common-tags": "1.8.0",
+    "debug": "4.1.0",
+    "express": "4.16.4",
+    "react": "16.6.3",
+    "react-dom": "16.6.3",
+    "react-router-dom": "4.3.1",
+    "winston": "3.1.0"
+  },
+  "devDependencies": {
+    "@types/body-parser": "1.17.0",
+    "@types/common-tags": "1.4.0",
+    "@types/debug": "0.0.31",
+    "@types/express": "4.16.0",
+    "@types/node": "10.12.11",
+    "@types/react": "16.7.11",
+    "@types/react-dom": "16.0.11",
+    "@types/react-router-dom": "4.3.1",
+    "@types/webpack-env": "1.13.6",
+    "css-loader": "1.0.1",
+    "file-loader": "2.0.0",
+    "ignore-loader": "0.1.2",
+    "nodemon": "1.18.7",
+    "style-loader": "0.23.1",
+    "ts-loader": "5.3.1",
+    "tslint": "5.11.0",
+    "tslint-config-airbnb": "5.11.1",
+    "tslint-react": "3.6.0",
+    "typescript": "3.2.1",
+    "webpack": "4.26.1",
+    "webpack-cli": "3.1.2",
+    "webpack-dev-server": "3.1.10",
+    "webpack-node-externals": "1.7.2"
+  }
+}
