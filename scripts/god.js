@@ -18,5 +18,5 @@ nodemon({
   log('K Thx Bye');
   process.exit();
 }).on('restart', () => {
-  log('Restarting everything.');
+  log('Scripts or config changed. Restarting everything.');
 });

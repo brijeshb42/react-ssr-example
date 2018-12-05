@@ -1,8 +1,8 @@
+const cluster = require('cluster');
 const path = require('path');
 const debug = require('debug');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
-const nodemon = require('nodemon');
 
 const config = require('../configs/webpack.server');
 const configClient = require('../configs/webpack.client');
@@ -19,42 +19,48 @@ const clientConfig = configClient({
 });
 const clientCompiler = webpack(clientConfig);
 
-let started = false;
+let started = false, error = false;
 let devServer;
+let currentWorker;
 
-function startServer() {
+function startServer(err, stats) {
+  if (err || stats.hasErrors()) {
+    log('Error encountered. Still running older version');
+    return;
+  }
   if (started) {
+    log('Webpack reloaded');
+    if (currentWorker && currentWorker.isConnected()) {
+      process.kill(currentWorker.process.pid, 'SIGUSR2');
+      log(`Killed worker with pid - ${currentWorker.process.pid}`);
+      cluster.fork();
+    }
     return;
   }
 
-  log('Webpack server build finished. Starting nodemon');
   started = true;
   const serverPath = path.join(serverCompiler.options.output.path, 'server.js');
-  log(`nodemon is watching - ${serverPath}`);
 
-  nodemon({
-    script: serverPath,
-    watch: [
-      path.join(srcPath, 'shared'),
-      serverPath,
-    ],
-    nodeArgs: process.argv.slice(2),
-  }).on('quit', () => {
-    if (devServer) {
-      logClient('Closing client dev server');
-      devServer.close(process.exit);
-    } else {
-      process.exit();
-    }
-    log('Closed!');
-  }).on('restart', () => {
-    log('nodemon restarted...');
+  cluster.setupMaster({
+    exec: serverPath,
   });
-  log('nodemon started');
+
+  cluster.on('online', (worker) => {
+    currentWorker = worker;
+    log(`New worker started with pid - ${worker.process.pid}`);
+  });
+
+  cluster.on('error', function() {
+    log(arguments, 'errorr');
+  });
+  cluster.fork();
 }
 
 log('Starting webpack');
-serverCompiler.watch(serverConfig.watchOptions || {}, startServer);
+serverCompiler.watch(serverConfig.watchOptions || {
+  watch: true,
+  aggregateTimeout: 200,
+}, startServer);
 clientConfig.entry.client.unshift(`webpack-dev-server/client?http://localhost:${clientPort}/`, 'webpack/hot/only-dev-server');
 logClient('Starting webpack');
 devServer = new WebpackDevServer(
