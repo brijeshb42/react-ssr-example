@@ -35,10 +35,12 @@ module.exports = function(options) {
         },
         __ISOMORPHIC__: JSON.stringify(true),
       }),
+      new webpack.HotModuleReplacementPlugin(),
     ],
     output: {
       path: path.join(process.cwd(), 'build/server'),
       filename: '[name].js',
+      libraryTarget: 'commonjs',
     },
     node: {
       __dirname: true,

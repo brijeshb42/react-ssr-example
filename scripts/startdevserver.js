@@ -1,4 +1,4 @@
-const cluster = require('cluster');
+const http = require('http');
 const path = require('path');
 const debug = require('debug');
 const webpack = require('webpack');
@@ -20,8 +20,10 @@ const clientConfig = configClient({
 const clientCompiler = webpack(clientConfig);
 
 let started = false, error = false;
+const serverPath = path.join(serverCompiler.options.output.path, 'server.js');
 let devServer;
-let currentWorker;
+let httpServer;
+let expressApp;
 
 function startServer(err, stats) {
   if (err || stats.hasErrors()) {
@@ -30,30 +32,22 @@ function startServer(err, stats) {
   }
   if (started) {
     log('Webpack reloaded');
-    if (currentWorker && currentWorker.isConnected()) {
-      process.kill(currentWorker.process.pid, 'SIGUSR2');
-      log(`Killed worker with pid - ${currentWorker.process.pid}`);
-      cluster.fork();
-    }
+    delete require.cache[require.resolve(serverPath)];
+    const { app: expressapp } = require(serverPath);
+    httpServer.removeListener('request', expressApp);
+    httpServer.on('request', expressapp);
+    expressApp = expressapp;
+    log('express router swapped');
     return;
   }
 
   started = true;
-  const serverPath = path.join(serverCompiler.options.output.path, 'server.js');
-
-  cluster.setupMaster({
-    exec: serverPath,
-  });
-
-  cluster.on('online', (worker) => {
-    currentWorker = worker;
-    log(`New worker started with pid - ${worker.process.pid}`);
-  });
-
-  cluster.on('error', function() {
-    log(arguments, 'errorr');
-  });
-  cluster.fork();
+  const { app: expressapp } = require(serverPath);
+  expressApp = expressapp;
+  httpServer = http.createServer(expressapp);
+  const port = process.env.BE_PORT ? parseInt(process.env.BE_PORT, 10) : 3000;
+  httpServer.listen(port);
+  log(`Backend running on http://localhost:${port}`);
 }
 
 log('Starting webpack');
@@ -61,12 +55,12 @@ serverCompiler.watch(serverConfig.watchOptions || {
   watch: true,
   aggregateTimeout: 200,
 }, startServer);
+
 clientConfig.entry.client.unshift(`webpack-dev-server/client?http://localhost:${clientPort}/`, 'webpack/hot/only-dev-server');
 logClient('Starting webpack');
 devServer = new WebpackDevServer(
   clientCompiler,
   Object.assign(clientConfig.devServer || {}, {
-    historyApiFallback: false,
     clientLogLevel: 'info',
     hot: true,
     hotOnly: true,
