@@ -1,19 +1,18 @@
-import express from 'express';
 import * as React from 'react';
 import { renderToNodeStream } from 'react-dom/server';
 
 import { BaseApp } from './Base';
 import { getHeader, getFooter } from './template';
+import { Request, Response, NextFunction } from 'express';
 
 const fePort = process.env.FE_PORT as string;
-const app = express();
 const isDev = process.env.NODE_ENV !== 'production';
 
-app.get('*', (req, res) => {
+function reactMiddleWare(req: Request, res: Response, next: NextFunction) {
   res.write(getHeader({
     isDev,
     fePort,
-    title: 'Testing',
+    title: 'Testing 1',
   }));
 
   if (!__ISOMORPHIC__) {
@@ -24,30 +23,28 @@ app.get('*', (req, res) => {
       scripts: ['client.js'],
       serverRendered: false,
     }));
-    return;
+  } else {
+    const routerContext = {};
+    const stream = renderToNodeStream(React.createElement(BaseApp, {
+      routerContext,
+      url: req.url,
+    }));
+    stream.pipe(res, {
+      end: false,
+    });
+
+    stream.on('end', () => {
+      res.end(
+        getFooter({
+          fePort,
+          scripts: ['client.js'],
+          serverRendered: true,
+        }),
+      );
+    });
   }
+}
 
-  const routerContext = {};
-  const stream = renderToNodeStream(React.createElement(BaseApp, {
-    routerContext,
-    url: req.url,
-  }));
-  // res.write(stream);
-  stream.pipe(res, {
-    end: false,
-  });
-
-  stream.on('end', () => {
-    res.end(
-      getFooter({
-        fePort,
-        scripts: ['client.js'],
-        serverRendered: true,
-      }),
-    );
-  });
-});
-
-export default app;
+export default reactMiddleWare;
 
 declare var __ISOMORPHIC__: boolean;

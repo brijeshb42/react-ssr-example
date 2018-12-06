@@ -38,7 +38,6 @@ module.exports = function(options) {
             NODE_ENV: JSON.stringify(process.env.NODE_ENV),
           },
         },
-        __HOT_RELOAD__: JSON.stringify(true),
       }),
       new webpack.HotModuleReplacementPlugin(),
     ],

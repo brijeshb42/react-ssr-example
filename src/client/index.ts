@@ -1,4 +1,3 @@
-import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
 import Base from './Base';
@@ -8,7 +7,7 @@ const appNode = document.getElementById('app');
 const renderFunc = serverRendered ? ReactDOM.hydrate : ReactDOM.render;
 renderFunc(Base, appNode);
 
-if (__HOT_RELOAD__) {
+if (process.env.NODE_ENV === 'development') {
   if (module.hot) {
     module.hot.accept('./Base', () => {
       const base = require('./Base').default;
@@ -16,6 +15,8 @@ if (__HOT_RELOAD__) {
       ReactDOM.render(base, appNode);
     });
   }
+
+  require('./dev');
 }
 
 declare var __HOT_RELOAD__: boolean;
