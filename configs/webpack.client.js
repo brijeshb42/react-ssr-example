@@ -6,7 +6,7 @@ module.exports = function(options) {
   return {
     mode: 'development',
     target: 'web',
-    devtool: 'inline-source-map',
+    devtool: 'cheap-eval-source-map',
     entry: {
       client:  [
         './src/client/index.ts',
@@ -19,10 +19,24 @@ module.exports = function(options) {
         use: 'ts-loader',
         exclude: /node_modules/,
       }, {
+        exclude: /node_modules/,
         test: /\.(scss|css)$/,
         use: [
           'style-loader',
-          'css-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              importLoaders: 1,
+            },
+          },
+          {
+            loader: 'postcss-loader',
+            options: {
+              config: {
+                path: path.dirname(__filename),
+              },
+            },
+          },
         ],
       }],
     },

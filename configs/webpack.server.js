@@ -7,28 +7,32 @@ module.exports = function(options) {
   return {
     mode: 'development',
     target: 'node',
+    devtool: 'cheap-module-eval-source-map',
     entry: {
       server:  [
         './src/server/index.ts',
       ],
     },
     resolve,
-    watch: true,
     externals: [
       nodeExternals({}),
     ],
     module: {
       rules: [{
         test: /\.tsx?$/,
-        use: 'ts-loader',
+        use: [{
+          loader: 'ts-loader',
+        }],
         exclude: /node_modules/,
       }, {
-        test: /\.(scss|css)$/,
-        use: 'ignore-loader'
+        exclude: /node_modules/,
+        test: /\.(c|sc|le)ss$/,
+        use: [{
+          loader: 'ignore-loader',
+        }],
       }],
     },
     plugins: [
-      new webpack.IgnorePlugin(/\.(css|less|scss)$/),
       new webpack.DefinePlugin({
         process: {
           env: JSON.stringify(process.env),

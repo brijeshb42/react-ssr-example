@@ -36,10 +36,13 @@ const log = require('debug')('dev:client');
 const eventSource = new EventSource('/devstream');
 eventSource.addEventListener('message', (ev) => {
   try {
-    const data: {type: string} = JSON.parse((ev as MessageEvent).data);
-    log(data);
-    showNotif(data.type, 'hello World');
+    const data: {type: string, data: string[]} = JSON.parse((ev as MessageEvent).data);
     log(`Message from stream - ${data.type}`);
+
+    if (data.type === 'error') {
+      showNotif('Server error', 'See console for details');
+      log(data.data.join('\n'));
+    }
   } catch (ex) {
     console.error(ex);
     log(ex);

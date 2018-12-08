@@ -2,6 +2,8 @@ import express from 'express';
 
 import reactMiddleWare from './reactMiddleWare';
 
+function noop() {}
+
 const app = express();
 
 type MiddleWares = {

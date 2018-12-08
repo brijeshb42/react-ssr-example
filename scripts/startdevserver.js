@@ -56,9 +56,38 @@ function closeOldConnections() {
   sseConnections = [];
 }
 
+// Initial request handler when webpack has not started yet.
+let initialListeners = [];
+function initialRequestListener(req, res) {
+  res.writeHead(200, {
+    'Content-Type': 'text/html',
+  });
+  res.write('<h1>Please wait while webpack is starting</h1>');
+  // res.end();
+  initialListeners.push(res);
+}
+function sendToListeners(message) {
+  initialListeners.forEach(conn => conn.write(message));
+}
+function closeListeners() {
+  initialListeners.forEach(conn => conn.end());
+  initialListeners = [];
+}
+
 function startServer(err, stats) {
-  if (err || stats.hasErrors()) {
-    sendEventToClients('error');
+  let errStr;
+  if (err) {
+    log(err.stack || err);
+    if (err.details) {
+      errStr = err.details;
+    }
+  } else if (stats.hasErrors()) {
+    const info = stats.toJson();
+    errStr = info.errors;
+  }
+
+  if (errStr) {
+    sendEventToClients('error', errStr);
     log('Error encountered. Still running older version');
     return;
   }
@@ -92,16 +121,27 @@ function startServer(err, stats) {
     middleWare: sseMiddleware,
   }]);
 
-  // Start http server the first time when webpack build finishes
-  // and then reuse this server to mount refreshed express app.
-  httpServer = http.createServer(expressapp);
-  const port = process.env.BE_PORT ? parseInt(process.env.BE_PORT, 10) : 3000;
-  httpServer.listen(port);
-  log(`Backend running on http://localhost:${port}`);
+  // Remove the catchall listener and use the actual express app
+  httpServer.removeListener('request', initialRequestListener);
+  httpServer.on('request', expressapp);
+  log(`Webpack build finished`);
+  // Refresh clients as now our express app is loaded
+  // and ready to serve
+  sendToListeners('Webpack done<script>setTimeout(function() {window.location.reload();}, 1000)</script>');
+  closeListeners();
 }
 
+// Start http server as early as possible so that clients
+// can start connecting even though webpack build is still
+// in progress or not even started.
+httpServer = http.createServer(initialRequestListener);
+const port = process.env.BE_PORT ? parseInt(process.env.BE_PORT, 10) : 3000;
+httpServer.listen(port);
+log(`Http server started on - http://localhost:${port}`);
+
 log('Starting webpack');
-serverCompiler.watch(
+sendToListeners('Starting webpack');
+  serverCompiler.watch(
   serverConfig.watchOptions || {
     watch: true,
     aggregateTimeout: 200,

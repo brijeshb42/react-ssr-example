@@ -1,0 +1,6 @@
+@tailwind preflight;
+@tailwind utilities;
+
+.app {
+  border: 1px solid #ccc;
+}
