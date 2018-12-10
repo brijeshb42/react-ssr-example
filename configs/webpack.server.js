@@ -38,6 +38,7 @@ module.exports = function(options) {
           env: JSON.stringify(process.env),
         },
         __ISOMORPHIC__: JSON.stringify(true),
+        BASE_DIR: JSON.stringify(path.resolve(path.dirname(__dirname))),
       }),
     ],
     output: {

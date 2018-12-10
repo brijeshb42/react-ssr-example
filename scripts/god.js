@@ -3,7 +3,7 @@ const nodemon = require('nodemon');
 const log = require('debug')('dev:god');
 
 const scriptPath = path.resolve(path.join(__dirname, 'startdevserver.js'));
-const basePath = path.dirname(scriptPath);
+const basePath = path.dirname(path.dirname(scriptPath));
 
 log('God is watching');
 

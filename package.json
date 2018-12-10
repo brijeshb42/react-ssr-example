@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "rm -rf build && NODE_ENV=development BE_PORT=3000 FE_PORT=3001 DEBUG=dev:god,dev:server,dev:client,dev:express node scripts/god.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "npm run clean && NODE_ENV=development BE_PORT=3000 FE_PORT=3001 DEBUG=dev:god,dev:server,dev:client,dev:express node scripts/god.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "rm -rf build",
+    "build:client": "npm run clean && NODE_ENV=production webpack --config configs/webpack.client.production.js"
   },
   "author": "Brijesh <brijesh@bitwiser.in>",
   "license": "MIT",
@@ -16,6 +18,7 @@
     "express": "4.16.4",
     "react": "16.6.3",
     "react-dom": "16.6.3",
+    "react-loadable": "5.5.0",
     "react-router-dom": "4.3.1",
     "winston": "3.1.0"
   },
@@ -27,13 +30,17 @@
     "@types/node": "10.12.11",
     "@types/react": "16.7.11",
     "@types/react-dom": "16.0.11",
+    "@types/react-loadable": "5.4.2",
     "@types/react-router-dom": "4.3.1",
     "@types/webpack-env": "1.13.6",
     "autoprefixer": "9.4.2",
     "css-loader": "1.0.1",
+    "cssnano": "4.1.7",
     "file-loader": "2.0.0",
     "ignore-loader": "0.1.2",
+    "mini-css-extract-plugin": "0.5.0",
     "nodemon": "1.18.7",
+    "optimize-css-assets-webpack-plugin": "5.0.1",
     "postcss-loader": "3.0.0",
     "precss": "4.0.0",
     "style-loader": "0.23.1",
@@ -46,6 +53,7 @@
     "webpack": "4.26.1",
     "webpack-cli": "3.1.2",
     "webpack-dev-server": "3.1.10",
+    "webpack-manifest-plugin": "2.0.4",
     "webpack-node-externals": "1.7.2"
   }
 }

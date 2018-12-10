@@ -4,7 +4,8 @@
         "tslint-config-airbnb",
         "tslint-react"
     ],
-    "jsRules": {},
+    "jsRules": {
+    },
     "rules": {
     },
     "rulesDirectory": []
