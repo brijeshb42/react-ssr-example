@@ -49,6 +49,8 @@ module.exports = function(options) {
       path: path.join(process.cwd(), 'build/client'),
       filename: '[name].[contenthash].js',
       publicPath: '/static/',
+      jsonpFunction: 'wjp',
+      hotUpdateFunction: 'whu',
     },
     optimization: {
       runtimeChunk: {

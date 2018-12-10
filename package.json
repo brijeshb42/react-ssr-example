@@ -7,7 +7,8 @@
     "start": "npm run clean && NODE_ENV=development BE_PORT=3000 FE_PORT=3001 DEBUG=dev:god,dev:server,dev:client,dev:express node scripts/god.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rm -rf build",
-    "build:client": "npm run clean && NODE_ENV=production webpack --config configs/webpack.client.production.js"
+    "build:client": "NODE_ENV=production webpack --config configs/webpack.client.production.js",
+    "build": "npm run clean && npm run build:client"
   },
   "author": "Brijesh <brijesh@bitwiser.in>",
   "license": "MIT",

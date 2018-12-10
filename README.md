@@ -5,6 +5,7 @@ An example React project to showcase -
 * Server-side rendering
 * Hot-reloading
 * Typescript
+* Lazy loading
 
 Setup -
 
