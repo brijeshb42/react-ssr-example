@@ -6,10 +6,10 @@ import Routes from '@shared/Routes';
 interface Props {
   url: string;
   routerContext: Object;
+  modules: string[];
 }
 
-/* tslint:disable-next-line:function-name */
-export function BaseApp({ url, routerContext }: Props) {
+export function BaseApp({ url, routerContext, modules }: Props) {
   return (
     <StaticRouter location={url} context={routerContext}>
       <Routes />

@@ -1,3 +1,5 @@
+import debug from 'debug';
+
 const notifNode = document.createElement('div');
 const titleNode = document.createElement('h4');
 const descNode = document.createElement('div');
@@ -13,7 +15,7 @@ notifNode.setAttribute(
   width: 30%;
   border: 1px solid 1px;
   padding: 5px 10px;
-  background: teal`,
+  background: teal`
 );
 let notifTimeout: NodeJS.Timeout;
 
@@ -23,20 +25,19 @@ function showNotif(text: string, desc: string = '') {
   descNode.innerHTML = desc;
 
   document.body.appendChild(notifNode);
-  notifTimeout = setTimeout(
-    () => {
-      document.body.removeChild(notifNode);
-    },
-    5000,
-  );
+  notifTimeout = setTimeout(() => {
+    document.body.removeChild(notifNode);
+  }, 5000);
 }
 
-const log = require('debug')('dev:client');
+const log = debug('dev:client');
 
 const eventSource = new EventSource('/devstream');
-eventSource.addEventListener('message', (ev) => {
+eventSource.addEventListener('message', ev => {
   try {
-    const data: {type: string, data: string[]} = JSON.parse((ev as MessageEvent).data);
+    const data: { type: string; data: string[] } = JSON.parse(
+      (ev as MessageEvent).data
+    );
     log(`Message from stream - ${data.type}`);
 
     if (data.type === 'error') {
@@ -44,7 +45,6 @@ eventSource.addEventListener('message', (ev) => {
       log(data.data.join('\n'));
     }
   } catch (ex) {
-    console.error(ex);
     log(ex);
   }
 });

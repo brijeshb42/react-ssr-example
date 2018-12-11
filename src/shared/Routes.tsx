@@ -1,14 +1,15 @@
 import * as React from 'react';
-import { Route, Switch } from 'react-router-dom';
 import { default as Loadable } from 'react-loadable';
-
-import App from './App';
+import { Route, Switch } from 'react-router-dom';
 
 import './styles/base.css';
 
-const test = Loadable({
-  /* tslint:disable-next-line:space-in-parens */
-  loader: () => import('./Test'/* webpackChunkName: "TestView" */),
+import App from './App';
+
+/* tslint:disable-next-line:variable-name */
+const Test = Loadable({
+  delay: 300,
+  loader: () => import('./Test'),
   loading: () => <div>Loading</div>,
 });
 
@@ -16,7 +17,7 @@ const test = Loadable({
 function RouteCollection() {
   return (
     <Switch>
-      <Route path="/test" component={test} />
+      <Route path="/test" component={Test} />
       <Route path="/" component={App} />
     </Switch>
   );
