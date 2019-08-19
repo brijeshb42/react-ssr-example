@@ -154,6 +154,7 @@ logClient('Starting webpack');
 webpackDevServer = new WebpackDevServer(
   clientCompiler,
   Object.assign(clientConfig.devServer || {}, {
+    disableHostCheck: true,
     clientLogLevel: 'info',
     hot: true,
     hotOnly: true,
